@@ -6,8 +6,14 @@
 ## 在线预览
 
 - **Vercel 线上地址**：<https://quiz-game-plum-ten.vercel.app/>
-- **GitHub Pages 备用地址**：<待开启后填写>
+- **GitHub Pages 备用地址**：<https://nijinbo916.github.io/quiz-game/>（国内可直接访问）
 - **GitHub 仓库地址**：<https://github.com/nijinbo916/quiz-game>
+
+> 部署方式：本地代码经 SSH 推送到 GitHub 仓库，仓库由 Vercel 导入并自动构建部署；
+> 此后每次推送到 `main` 分支，Vercel 与 GitHub Pages 都会自动重新部署。
+>
+> 说明：`*.vercel.app` 域名在部分网络环境下受 DNS 污染影响可能无法访问，
+> 此时请使用上面的 GitHub Pages 备用地址。
 
 ## 玩法
 
