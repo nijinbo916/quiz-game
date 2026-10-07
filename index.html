@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Game · 前端知识小挑战</title>
+  <meta name="description" content="Web 开发技术 Lesson 2 课堂项目 —— Quiz Game（HTML + CSS + JS）">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- ============ 顶栏 ============ -->
+    <header class="app-bar">
+      <div class="app-brand">
+        <span class="app-logo" aria-hidden="true">🧠</span>
+        <div class="app-brand-text">
+          <h1>前端知识小挑战</h1>
+          <p>Web 开发技术 · Lesson 2 课堂项目</p>
+        </div>
+      </div>
+      <div class="app-meta">
+        <span class="chip">最高分 <strong id="bestScore">--</strong></span>
+      </div>
+    </header>
+
+    <!-- ============ 屏幕 1：开始页 ============ -->
+    <section id="screenStart" class="screen start">
+      <div class="start-emoji" aria-hidden="true">🎯</div>
+      <h2 class="start-title">准备好了吗？</h2>
+      <p class="start-sub">10 道前端基础题，每题 20 秒。选对得分，连对还有加成 🔥</p>
+
+      <ul class="rules">
+        <li><span class="rule-dot"></span>共 <strong id="startTotal">10</strong> 题，每题 4 个选项，单选</li>
+        <li><span class="rule-dot"></span>每题限时 <strong>20</strong> 秒，超时自动判错</li>
+        <li><span class="rule-dot"></span>选完立即给反馈与知识点解析</li>
+        <li><span class="rule-dot"></span>键盘 <kbd>1</kbd>–<kbd>4</kbd> 选项，<kbd>Enter</kbd> 下一题</li>
+      </ul>
+
+      <button id="startBtn" class="btn btn-primary btn-lg" type="button">开始挑战</button>
+    </section>
+
+    <!-- ============ 屏幕 2：答题页 ============ -->
+    <section id="screenQuiz" class="screen quiz" hidden>
+
+      <div class="quiz-bars">
+        <div class="progress">
+          <div class="progress-meta">
+            <span>第 <strong id="qIndex">1</strong> / <span id="qTotal">10</span> 题</span>
+            <span id="streakChip" class="streak" hidden>🔥 连对 <strong id="streakNum">0</strong></span>
+            <span id="scoreChip" class="score-chip">得分 <strong id="scoreNow">0</strong></span>
+          </div>
+          <div class="track"><div id="progressFill" class="track-fill"></div></div>
+        </div>
+
+        <div class="timer-row">
+          <div class="track track-timer"><div id="timerFill" class="track-fill"></div></div>
+          <span id="timerText" class="timer-text">20s</span>
+        </div>
+      </div>
+
+      <h2 id="questionText" class="question-text"></h2>
+
+      <ul id="options" class="options"></ul>
+
+      <div id="feedback" class="feedback" hidden aria-live="polite">
+        <p class="feedback-head">
+          <span id="feedbackIcon" class="feedback-icon" aria-hidden="true"></span>
+          <strong id="feedbackText"></strong>
+        </p>
+        <p id="feedbackTip" class="feedback-tip"></p>
+      </div>
+
+      <footer class="quiz-foot">
+        <button id="nextBtn" class="btn btn-primary" type="button" disabled>下一题 →</button>
+      </footer>
+    </section>
+
+    <!-- ============ 屏幕 3：结算页 ============ -->
+    <section id="screenResult" class="screen result" hidden>
+      <div class="result-score">
+        <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+          <circle id="ringFill" class="ring-fill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="result-score-text">
+          <strong id="resultScore">0</strong>
+          <span>/ <span id="resultTotal">10</span> 分</span>
+        </div>
+      </div>
+
+      <h2 id="resultGrade" class="result-grade">—</h2>
+      <p id="resultDesc" class="result-desc"></p>
+
+      <dl class="result-stats">
+        <div><dt>正确率</dt><dd id="statRate">0%</dd></div>
+        <div><dt>最高连对</dt><dd id="statStreak">0</dd></div>
+        <div><dt>用时</dt><dd id="statTime">0s</dd></div>
+      </dl>
+
+      <div class="result-actions">
+        <button id="againBtn" class="btn btn-primary" type="button">再来一局</button>
+        <button id="reviewBtn" class="btn btn-ghost" type="button">查看错题复盘</button>
+      </div>
+
+      <div id="review" class="review" hidden>
+        <h3 class="review-title">答题复盘</h3>
+        <ol id="reviewList" class="review-list"></ol>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
