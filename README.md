@@ -5,9 +5,9 @@
 
 ## 在线预览
 
-- **Vercel 线上地址**：<待部署后填写>
+- **Vercel 线上地址**：<https://quiz-game-plum-ten.vercel.app/>
 - **GitHub Pages 备用地址**：<待开启后填写>
-- **GitHub 仓库地址**：<待填写>
+- **GitHub 仓库地址**：<https://github.com/nijinbo916/quiz-game>
 
 ## 玩法
 
