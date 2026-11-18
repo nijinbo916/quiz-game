@@ -79,11 +79,20 @@ const QUESTIONS = [
 const TIME_PER_QUESTION = 20; // 秒
 const BEST_KEY = 'quiz-best-score';
 
+/* 前后端联调（11-13）：题目来自 Java 后端 /getQuestion，地址在 js/config.js 里配置 */
+const API = window.QUIZ_API_BASE || '';
+const TOKEN_KEY = 'quiz-user-token';
+const NAME_KEY = 'quiz-user-name';
+const GUEST_KEY = 'quiz-user-guest';
+
 /* ---------- 3. DOM 引用 ---------- */
 const el = {
   bestScore: document.getElementById('bestScore'),
   startTotal: document.getElementById('startTotal'),
   startBtn: document.getElementById('startBtn'),
+  userChip: document.getElementById('userChip'),
+  userName: document.getElementById('userName'),
+  logoutLink: document.getElementById('logoutLink'),
 
   screenStart: document.getElementById('screenStart'),
   screenQuiz: document.getElementById('screenQuiz'),
@@ -147,8 +156,8 @@ function shuffle(arr) {
 }
 
 /** 把题库复制并打乱：题目顺序 + 每题选项顺序都打乱 */
-function buildRound() {
-  return shuffle(QUESTIONS).map((item) => {
+function buildRound(source) {
+  return shuffle(source).map((item) => {
     const correctText = item.options[item.answer];
     const options = shuffle(item.options);
     return {
@@ -158,6 +167,50 @@ function buildRound() {
       tip: item.tip
     };
   });
+}
+
+/** 把后端 /getQuestion 的返回（{question, answers:[{text,correct}]}）转成本地题库格式 */
+function convertRemote(list) {
+  return list.map((item) => {
+    const options = item.answers.map((a) => a.text);
+    const answer = item.answers.findIndex((a) => a.correct);
+    return { q: item.question, options, answer: answer < 0 ? 0 : answer, tip: '' };
+  });
+}
+
+/** 带上登录时拿到的 token，从后端随机抽 5 道题（老师笔记 2.7 的 quiz 逻辑） */
+function fetchRemoteQuestions() {
+  const token = readToken();
+  return new Promise((resolve, reject) => {
+    if (!token) {
+      reject(new Error('no-token'));
+      return;
+    }
+    axios.get(API + '/getQuestion', { headers: { token } })
+      .then((response) => {
+        const res = response.data;
+        if (res.code === 1 && Array.isArray(res.data) && res.data.length > 0) {
+          resolve(convertRemote(res.data));
+        } else {
+          reject(new Error(res.msg || '获取题目失败'));
+        }
+      })
+      .catch((error) => reject(error));
+  });
+}
+
+function readToken() {
+  try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+}
+function readGuest() {
+  try { return localStorage.getItem(GUEST_KEY) === '1'; } catch (e) { return false; }
+}
+function clearLogin() {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(NAME_KEY);
+    localStorage.removeItem(GUEST_KEY);
+  } catch (e) { /* 忽略 */ }
 }
 
 /** 切换屏幕 */
@@ -393,23 +446,43 @@ function renderReview() {
 
 /* ---------- 12. 开始 / 重开 ---------- */
 function startGame() {
-  state.round = buildRound();
-  state.index = 0;
-  state.score = 0;
-  state.streak = 0;
-  state.maxStreak = 0;
-  state.records = [];
-  state.locked = false;
-  state.startedAt = Date.now();
+  // 未登录且不是游客：按笔记 2.7 的要求，先去登录页拿 token
+  if (!readToken() && !readGuest()) {
+    window.location.href = 'login.html';
+    return;
+  }
 
-  el.streakChip.hidden = true;
-  el.streakNum.textContent = '0';
-  el.review.hidden = true;
-  el.reviewBtn.textContent = '查看错题复盘';
-  el.ringFill.style.strokeDashoffset = (2 * Math.PI * 52).toFixed(1);
+  el.startBtn.disabled = true;
+  el.startBtn.textContent = '正在抽取题目…';
 
-  showScreen('quiz');
-  renderQuestion();
+  fetchRemoteQuestions()
+    .catch(() => {
+      // 后端没启动 / token 失效：回退到本地演示题库，页面不至于开天窗
+      alert('未能从后端获取题目，本次使用本地演示题库（共 ' + QUESTIONS.length + ' 题）');
+      return QUESTIONS;
+    })
+    .then((source) => {
+      el.startBtn.disabled = false;
+      el.startBtn.textContent = '开始挑战';
+
+      state.round = buildRound(source);
+      state.index = 0;
+      state.score = 0;
+      state.streak = 0;
+      state.maxStreak = 0;
+      state.records = [];
+      state.locked = false;
+      state.startedAt = Date.now();
+
+      el.streakChip.hidden = true;
+      el.streakNum.textContent = '0';
+      el.review.hidden = true;
+      el.reviewBtn.textContent = '查看错题复盘';
+      el.ringFill.style.strokeDashoffset = (2 * Math.PI * 52).toFixed(1);
+
+      showScreen('quiz');
+      renderQuestion();
+    });
 }
 
 /* ---------- 13. 事件绑定 ---------- */
@@ -432,6 +505,12 @@ el.nextBtn.addEventListener('click', next);
 el.reviewBtn.addEventListener('click', () => {
   el.review.hidden = !el.review.hidden;
   el.reviewBtn.textContent = el.review.hidden ? '查看错题复盘' : '收起复盘';
+});
+
+/* 退出登录 */
+el.logoutLink.addEventListener('click', () => {
+  clearLogin();
+  window.location.href = 'login.html';
 });
 
 /* 键盘操作：1-4 / A-D 选项，Enter / 空格 下一题 */
@@ -465,6 +544,14 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ---------- 14. 初始化 ---------- */
+try {
+  const name = localStorage.getItem(NAME_KEY);
+  if (name || readGuest()) {
+    el.userName.textContent = name || '游客';
+    el.userChip.hidden = false;
+  }
+} catch (e) { /* 忽略 */ }
+
 el.startTotal.textContent = QUESTIONS.length;
 el.qTotal.textContent = QUESTIONS.length;
 renderBest();

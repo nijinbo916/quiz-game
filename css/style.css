@@ -655,3 +655,112 @@ kbd {
     transition-duration: .001ms !important;
   }
 }
+
+/* ============================================================
+   用户端登录 / 注册页（11-13 前后端联调新增）
+   ============================================================ */
+
+.auth-card {
+  max-width: 400px;
+  margin: 48px auto 0;
+  padding: 36px 32px 28px;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.auth-logo {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  background: var(--primary-soft);
+  border-radius: 18px;
+}
+
+.auth-title {
+  font-size: 22px;
+  text-align: center;
+}
+
+.auth-sub {
+  margin: 8px 0 22px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.auth-field {
+  margin-bottom: 16px;
+}
+
+.auth-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.auth-field input {
+  width: 100%;
+  padding: 11px 14px;
+  font: inherit;
+  color: var(--text);
+  background: #fbfbfe;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+
+.auth-field input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(91, 91, 214, .12);
+}
+
+.auth-btn {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.auth-switch {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.auth-switch a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-error {
+  margin-top: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--bad);
+  background: var(--bad-soft);
+  border-radius: var(--radius-sm);
+}
+
+/* 顶栏的用户信息 */
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--text-soft);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.user-chip strong { color: var(--text); }
+.user-chip a { color: var(--bad); text-decoration: none; font-weight: 600; }

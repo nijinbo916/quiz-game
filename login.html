@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 · Quiz 用户端</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="auth-card">
+    <div class="auth-logo" aria-hidden="true">🧠</div>
+    <h1 class="auth-title">Quiz 用户端</h1>
+    <p class="auth-sub">登录后开始答题，题目由 Java 后端随机抽取</p>
+
+    <div class="auth-field">
+      <label for="username">用户名</label>
+      <input id="username" type="text" autocomplete="username" placeholder="请输入用户名">
+    </div>
+    <div class="auth-field">
+      <label for="password">密码</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
+    </div>
+
+    <button id="login-btn" class="btn btn-primary btn-lg auth-btn" type="button">登 录</button>
+
+    <p class="auth-switch">还没有账号？<a href="register.html">去注册</a></p>
+    <p class="auth-error" id="auth-error" hidden></p>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    var API = window.QUIZ_API_BASE;
+
+    document.getElementById('login-btn').addEventListener('click', function () {
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value;
+      var errorBox = document.getElementById('auth-error');
+
+      errorBox.hidden = true;
+      if (!username || !password) {
+        errorBox.textContent = '请填写用户名和密码';
+        errorBox.hidden = false;
+        return;
+      }
+
+      // 用户端登录：不带 userrole，普通用户和管理员都可以进来答题
+      axios.post(API + '/login', { username: username, password: password })
+        .then(function (response) {
+          var res = response.data;
+          if (res.code === 1) {
+            // 登录成功：data 就是 JWT token，存到本地供答题页使用
+            localStorage.setItem('quiz-user-token', res.data);
+            localStorage.setItem('quiz-user-name', username);
+            window.location.href = 'index.html';
+          } else {
+            errorBox.textContent = res.msg || '登录失败';
+            errorBox.hidden = false;
+          }
+        })
+        .catch(function () {
+          // 后端连不上（比如没启动 / 静态部署版）：给游客模式入口
+          if (confirm('未连接到 Java 后端，是否以游客模式体验本地演示题库？')) {
+            localStorage.setItem('quiz-user-guest', '1');
+            window.location.href = 'index.html';
+          }
+        });
+    });
+  </script>
+</body>
+</html>

@@ -21,6 +21,10 @@
         </div>
       </div>
       <div class="app-meta">
+        <span id="userChip" class="user-chip" hidden>
+          <strong id="userName">--</strong>
+          <a href="login.html" id="logoutLink">退出</a>
+        </span>
         <span class="chip">最高分 <strong id="bestScore">--</strong></span>
       </div>
     </header>
@@ -112,6 +116,8 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>注册 · Quiz 用户端</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="auth-card">
+    <div class="auth-logo" aria-hidden="true">📝</div>
+    <h1 class="auth-title">注册新账号</h1>
+    <p class="auth-sub">用户端注册的都是普通用户，管理员请在后台添加</p>
+
+    <div class="auth-field">
+      <label for="username">用户名</label>
+      <input id="username" type="text" autocomplete="username" placeholder="只限字母和数字">
+    </div>
+    <div class="auth-field">
+      <label for="password">密码</label>
+      <input id="password" type="password" autocomplete="new-password" placeholder="6 位以上">
+    </div>
+    <div class="auth-field">
+      <label for="confirm-password">确认密码</label>
+      <input id="confirm-password" type="password" autocomplete="new-password" placeholder="再输入一遍密码">
+    </div>
+
+    <button id="register-btn" class="btn btn-primary btn-lg auth-btn" type="button">注 册</button>
+
+    <p class="auth-switch">已有账号？<a href="login.html">去登录</a></p>
+    <p class="auth-error" id="auth-error" hidden></p>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    var API = window.QUIZ_API_BASE;
+
+    document.getElementById('register-btn').addEventListener('click', function () {
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value;
+      var confirmPassword = document.getElementById('confirm-password').value;
+      var errorBox = document.getElementById('auth-error');
+
+      errorBox.hidden = true;
+      if (!username || !password || !confirmPassword) {
+        errorBox.textContent = '请填写完整';
+        errorBox.hidden = false;
+        return;
+      }
+      if (password !== confirmPassword) {
+        errorBox.textContent = '两次输入的密码不一致';
+        errorBox.hidden = false;
+        return;
+      }
+
+      // 用户端注册接口：角色固定为普通用户（userRole=0），后端已写死
+      axios.post(API + '/register', {
+        username: username,
+        password: password,
+        checkpassword: confirmPassword
+      })
+        .then(function (response) {
+          var res = response.data;
+          if (res.code === 1) {
+            alert('注册成功！请登录');
+            window.location.href = 'login.html';
+          } else {
+            // 注册失败：把后端回传的原因（查重 / 格式问题）展示出来
+            errorBox.textContent = res.msg || '注册失败';
+            errorBox.hidden = false;
+          }
+        })
+        .catch(function () {
+          errorBox.textContent = '请求失败，请确认后端已启动';
+          errorBox.hidden = false;
+        });
+    });
+  </script>
+</body>
+</html>
