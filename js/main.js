@@ -550,6 +550,11 @@ try {
     el.userName.textContent = name || '游客';
     el.userChip.hidden = false;
   }
+  if (!readToken()) {
+    // 未登录时在顶栏显示「登录 / 注册」入口
+    const loginLink = document.getElementById('loginLink');
+    if (loginLink) loginLink.hidden = false;
+  }
 } catch (e) { /* 忽略 */ }
 
 el.startTotal.textContent = QUESTIONS.length;
